@@ -148,6 +148,8 @@ void z_bss_zero(void)
 #ifdef DT_CCM_BASE_ADDRESS
 	(void)memset(&__ccm_bss_start, 0,
 		     ((u32_t) &__ccm_bss_end - (u32_t) &__ccm_bss_start));
+	(void)memset(&__ccm_noinit_start, 0,
+		((u32_t) &__ccm_noinit_end- (u32_t) &__ccm_noinit_start));
 #endif
 #ifdef CONFIG_CODE_DATA_RELOCATION
 	extern void bss_zeroing_relocation(void);

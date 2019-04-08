@@ -49,6 +49,7 @@
 		!__builtin_types_compatible_p(__typeof__(array), \
 					      __typeof__(&(array)[0])))
 
+#ifndef ARRAY_SIZE
 #if defined(__cplusplus)
 template < class T, size_t N >
 constexpr size_t ARRAY_SIZE(T(&)[N]) { return N; }
@@ -60,6 +61,7 @@ constexpr size_t ARRAY_SIZE(T(&)[N]) { return N; }
 #define ARRAY_SIZE(array) \
 	((unsigned long) (IS_ARRAY(array) + \
 		(sizeof(array) / sizeof((array)[0]))))
+#endif
 #endif
 
 /* Evaluates to 1 if ptr is part of array, 0 otherwise; compile error if

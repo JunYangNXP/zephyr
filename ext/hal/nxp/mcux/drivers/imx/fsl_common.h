@@ -386,6 +386,11 @@ _Pragma("diag_suppress=Pm120")
 #error Toolchain not supported.
 #endif /* defined(__ICCARM__) */
 /* @} */
+
+#define RAM_ADDRESS_ALIGNMENT(n) __attribute__((aligned(n)))
+#define DMA_INIT_DATA_ALIGN(n) RAM_ADDRESS_ALIGNMENT(n) __attribute__((section("m_dma_init_data")))
+
+
 /*******************************************************************************
  * API
  ******************************************************************************/

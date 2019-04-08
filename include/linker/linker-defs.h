@@ -24,6 +24,11 @@
 #include <misc/util.h>
 #include <offsets.h>
 
+#define DT_CCM_BASE_ADDRESS 0x20000000
+#ifdef DT_CCM_BASE_ADDRESS
+#define DT_CCM_SIZE 256
+#endif
+
 #ifdef _LINKER
 
 
