@@ -22,3 +22,6 @@ zephyr_sources_ifdef(CONFIG_SPI_MCUX_LPSPI    fsl_lpspi.c)
 zephyr_sources_ifdef(CONFIG_UART_MCUX_LPUART  fsl_lpuart.c)
 zephyr_sources_ifdef(CONFIG_ETH_MCUX          fsl_enet.c)
 zephyr_sources_ifdef(CONFIG_ENTROPY_MCUX_TRNG fsl_trng.c)
+zephyr_sources_ifdef(CONFIG_DISK_ACCESS_SDHC_CONTROLLER fsl_usdhc.c)
+
+add_subdirectory(fsl_sdmmc)

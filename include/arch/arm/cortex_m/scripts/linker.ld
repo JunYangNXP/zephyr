@@ -409,6 +409,19 @@ SECTIONS
 	*(COMMON)
 	*(".kernel_bss.*")
 
+#ifdef CONFIG_CUSTOM_SYMBOL_LAYOUT
+	_jpeg_buf = .;
+	. = . + (10 * 1024);
+	. = ALIGN (1024);
+	_fb_buf = .;
+	. = . + (480 * 272 * 2 + 8);
+	. = ALIGN(4);
+	_fb_base = .;
+	. = . + 256 * 1024;
+	. = ALIGN(4);
+	_fballoc = .;
+	. = . + 256 * 1024;
+#endif
         /*
          * As memory is cleared in words only, it is simpler to ensure the BSS
          * section ends on a 4 byte boundary. This wastes a maximum of 3 bytes.
@@ -490,6 +503,11 @@ SECTIONS
 		__ccm_noinit_start = .;
 		*(.ccm_noinit)
 		*(".ccm_noinit.*")
+#ifdef CONFIG_CUSTOM_SYMBOL_LAYOUT
+		. = ALIGN(64);
+		*(m_dma_noninit_data)
+#endif
+		. = ALIGN(4);
 	} GROUP_LINK_IN(CCM)
 
 	__ccm_noinit_end = .;
@@ -499,6 +517,11 @@ SECTIONS
 		__ccm_data_start = .;
 		*(.ccm_data)
 		*(".ccm_data.*")
+#ifdef CONFIG_CUSTOM_SYMBOL_LAYOUT
+		. = ALIGN(1024);
+		*(m_dma_init_data)
+#endif
+		. = ALIGN(4);
 	} GROUP_LINK_IN(CCM AT> ROMABLE_REGION)
 
 	__ccm_data_end = .;

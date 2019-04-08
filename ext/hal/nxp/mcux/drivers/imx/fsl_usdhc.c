@@ -5,11 +5,13 @@
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
+#include <misc/printk.h>
 
 #include "fsl_usdhc.h"
 #if defined(FSL_SDK_ENABLE_DRIVER_CACHE_CONTROL) && FSL_SDK_ENABLE_DRIVER_CACHE_CONTROL
 #include "fsl_cache.h"
 #endif /* FSL_SDK_ENABLE_DRIVER_CACHE_CONTROL */
+#include "fsl_common.h"
 
 /*******************************************************************************
  * Definitions
@@ -30,7 +32,7 @@
 /* Typedef for interrupt handler. */
 typedef void (*usdhc_isr_t)(USDHC_Type *base, usdhc_handle_t *handle);
 /*! @brief Dummy data buffer for mmc boot mode  */
-AT_NONCACHEABLE_SECTION_ALIGN(uint32_t s_usdhcBootDummy, USDHC_ADMA2_ADDRESS_ALIGN);
+uint32_t s_usdhcBootDummy DMA_INIT_DATA_ALIGN(USDHC_ADMA2_ADDRESS_ALIGN);
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
@@ -791,6 +793,8 @@ static status_t USDHC_TransferDataBlocking(USDHC_Type *base, usdhc_data_t *data,
     return error;
 }
 
+static void usdhc_irq_connect(void);
+
 /*!
  * brief USDHC module initialization function.
  *
@@ -858,6 +862,7 @@ void USDHC_Init(USDHC_Type *base, const usdhc_config_t *config)
     base->MIX_CTRL &= ~(USDHC_MIX_CTRL_DMAEN_MASK | USDHC_MIX_CTRL_DDR_EN_MASK);
     /* Enable interrupt status but doesn't enable interrupt signal. */
     USDHC_SetTransferInterrupt(base, false);
+	usdhc_irq_connect();
 }
 
 /*!
@@ -2016,3 +2021,18 @@ void USDHC2_DriverIRQHandler(void)
 }
 
 #endif
+#include "irq.h"
+static int g_usdhc_irq_connected;
+static void usdhc_irq_connect(void)
+{
+	if (g_usdhc_irq_connected)
+		return;
+	g_usdhc_irq_connected = 1;
+#ifdef USDHC1
+	IRQ_CONNECT(110, 0, USDHC1_DriverIRQHandler, 0, 0);
+#endif
+#ifdef USDHC2
+	IRQ_CONNECT(111, 0, USDHC2_DriverIRQHandler, 0, 0);
+#endif
+
+}

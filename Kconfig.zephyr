@@ -149,6 +149,13 @@ config CUSTOM_LINKER_SCRIPT
 	  linker script and avoid having to change the script provided by
 	  Zephyr.
 
+config CUSTOM_SYMBOL_LAYOUT
+        bool "Custom symbols provided in linker scripts"
+	default y
+        help
+          Set this option if you have symbols needed to
+          be defined in linker script.
+
 config CUSTOM_RODATA_LD
 	bool "Include custom-rodata.ld"
 	help
