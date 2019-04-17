@@ -160,11 +160,32 @@ static ALWAYS_INLINE void clkInit(void)
 	CLOCK_SetDiv(kCLOCK_LcdifDiv, 1);
 #endif
 
+#ifdef CONFIG_CMOS_IMAGE_SENSOR_INTERFACE
+	/* CSI MCLK select 24M. */
+	CLOCK_SetMux(kCLOCK_CsiMux, 0);
+	CLOCK_SetDiv(kCLOCK_CsiDiv, 0);
+#endif
+
 	/* Keep the system clock running so SYSTICK can wake up the system from
 	 * wfi.
 	 */
 	CLOCK_SetMode(kCLOCK_ModeRun);
 
+}
+
+static inline void flex_ram_init(void)
+{
+	/*DTCM 480KB and ITCM 32KB*/
+	IOMUXC_GPR->GPR14 &= ~(IOMUXC_GPR_GPR14_CM7_CFGDTCMSZ_MASK |
+		IOMUXC_GPR_GPR14_CM7_CFGITCMSZ_MASK);
+	IOMUXC_GPR->GPR14 |= IOMUXC_GPR_GPR14_CM7_CFGDTCMSZ(10) |
+		IOMUXC_GPR_GPR14_CM7_CFGITCMSZ(10);
+
+	IOMUXC_GPR->GPR17 = 0xEAAAAAAA;
+
+	IOMUXC_GPR->GPR16 |= (IOMUXC_GPR_GPR16_INIT_DTCM_EN_MASK |
+		IOMUXC_GPR_GPR16_FLEXRAM_BANK_CFG_SEL_MASK |
+		IOMUXC_GPR_GPR16_INIT_ITCM_EN_MASK);
 }
 
 /**
@@ -221,6 +242,7 @@ static int imxrt_init(struct device *arg)
 	 */
 	NMI_INIT();
 
+	flex_ram_init();
 	/* restore interrupt state */
 	irq_unlock(oldLevel);
 	return 0;

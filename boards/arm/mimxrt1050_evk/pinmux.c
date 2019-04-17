@@ -16,6 +16,31 @@ static gpio_pin_config_t enet_gpio_config = {
 };
 #endif
 
+#ifdef CONFIG_CMOS_IMAGE_SENSOR_INTERFACE
+static void mimxrt1050_evk_csi_io_init(void)
+{
+	CLOCK_EnableClock(kCLOCK_Iomuxc);           /* iomuxc clock (iomuxc_clk_enable): 0x03u */
+
+	IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_04_GPIO1_IO04, 0U);
+	IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_00_LPI2C1_SCL, 1U);
+	IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_01_LPI2C1_SDA, 1U);
+	IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_04_CSI_PIXCLK, 0U);
+	IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_05_CSI_MCLK, 0U);
+	IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_06_CSI_VSYNC, 0U);
+	IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_07_CSI_HSYNC, 0U);
+	IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_08_CSI_DATA09, 0U);
+	IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_09_CSI_DATA08, 0U);
+	IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_10_CSI_DATA07, 0U);
+	IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_11_CSI_DATA06, 0U);
+	IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_12_CSI_DATA05, 0U);
+	IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_13_CSI_DATA04, 0U);
+	IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_14_CSI_DATA03, 0U);
+	IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_15_CSI_DATA02, 0U);
+	IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_00_LPI2C1_SCL, 0xD8B0u);
+	IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_01_LPI2C1_SDA, 0xD8B0u);
+}
+#endif
+
 static int mimxrt1050_evk_init(struct device *dev)
 {
 	ARG_UNUSED(dev);
@@ -213,6 +238,10 @@ static int mimxrt1050_evk_init(struct device *dev)
 	GPIO_PinInit(GPIO2, 31, &config);
 #endif
 
+#ifdef CONFIG_CMOS_IMAGE_SENSOR_INTERFACE
+		mimxrt1050_evk_csi_io_init();
+#endif
+
 	return 0;
 }
 
@@ -230,4 +259,20 @@ static int mimxrt1050_evk_phy_reset(struct device *dev)
 SYS_INIT(mimxrt1050_evk_init, PRE_KERNEL_1, 0);
 #ifdef CONFIG_ETH_MCUX_0
 SYS_INIT(mimxrt1050_evk_phy_reset, PRE_KERNEL_2, 0);
+#endif
+
+#ifdef CONFIG_CMOS_IMAGE_SENSOR_INTERFACE
+#define SENSOR_PWDN_GPIO		GPIO1
+#define SENSOR_PWDN_GPIO_PIN 	4
+
+void img_sensor_power(int on)
+{
+	gpio_pin_config_t config = {
+		kGPIO_DigitalOutput, 1,
+	};
+	if (!on)
+		config.outputLogic = 0;
+	GPIO_PinInit(SENSOR_PWDN_GPIO, SENSOR_PWDN_GPIO_PIN, &config);
+}
+
 #endif

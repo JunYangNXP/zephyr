@@ -47,20 +47,19 @@
 /*! @brief SD card flags */
 enum _sd_card_flag
 {
-    kSD_SupportHighCapacityFlag = (1U << 1U),     /*!< Support high capacity */
-    kSD_Support4BitWidthFlag = (1U << 2U),        /*!< Support 4-bit data width */
-    kSD_SupportSdhcFlag = (1U << 3U),             /*!< Card is SDHC */
-    kSD_SupportSdxcFlag = (1U << 4U),             /*!< Card is SDXC */
-    kSD_SupportVoltage180v = (1U << 5U),          /*!< card support 1.8v voltage*/
-    kSD_SupportSetBlockCountCmd = (1U << 6U),     /*!< card support cmd23 flag*/
-    kSD_SupportSpeedClassControlCmd = (1U << 7U), /*!< card support speed class control flag */
+	kSD_SupportHighCapacityFlag = (1U << 1U),     /*!< Support high capacity */
+	kSD_Support4BitWidthFlag = (1U << 2U),        /*!< Support 4-bit data width */
+	kSD_SupportSdhcFlag = (1U << 3U),             /*!< Card is SDHC */
+	kSD_SupportSdxcFlag = (1U << 4U),             /*!< Card is SDXC */
+	kSD_SupportVoltage180v = (1U << 5U),          /*!< card support 1.8v voltage*/
+	kSD_SupportSetBlockCountCmd = (1U << 6U),     /*!< card support cmd23 flag*/
+	kSD_SupportSpeedClassControlCmd = (1U << 7U), /*!< card support speed class control flag */
 };
 
 /*! @brief card user parameter, user can define the parameter according the board, card capability */
-typedef struct _sdcard_usr_param
-{
-    const sdmmchost_detect_card_t *cd; /*!< card detect type */
-    const sdmmchost_pwr_card_t *pwr;   /*!< power control configuration */
+typedef struct _sdcard_usr_param {
+	const sdmmchost_detect_card_t *cd; /*!< card detect type */
+	const sdmmchost_pwr_card_t *pwr;   /*!< power control configuration */
 } sdcard_usr_param_t;
 
 
@@ -69,8 +68,7 @@ typedef struct _sdcard_usr_param
  *
  * Define the card structure including the necessary fields to identify and describe the card.
  */
-typedef struct _sd_card
-{
+typedef struct _sd_card {
 	SDMMCHOST_CONFIG host; /*!< Host information */
 
 	sdcard_usr_param_t usrParam;    /*!< user parameter */

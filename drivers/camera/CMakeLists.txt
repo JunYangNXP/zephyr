@@ -1,0 +1,2 @@
+
+zephyr_sources_ifdef(CONFIG_CMOS_IMAGE_SENSOR_INTERFACE	camera_mcux_csi.c)

@@ -26,7 +26,7 @@
 
 #define DT_CCM_BASE_ADDRESS 0x20000000
 #ifdef DT_CCM_BASE_ADDRESS
-#define DT_CCM_SIZE 256
+#define DT_CCM_SIZE 480
 #endif
 
 #ifdef _LINKER
@@ -208,6 +208,13 @@ extern char __gcov_bss_size[];
 
 /* end address of image, used by newlib for the heap */
 extern char _end[];
+
+#ifdef CONFIG_CUSTOM_SYMBOL_LAYOUT
+extern char _jpeg_buf;
+extern char _fb_buf;
+extern char _fb_base;
+extern char _fballoc;
+#endif
 
 #ifdef DT_CCM_BASE_ADDRESS
 extern char __ccm_data_rom_start[];

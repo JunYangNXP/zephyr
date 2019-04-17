@@ -54,18 +54,6 @@ extern "C" {
 #endif
 
 /*!
- * @name Event Function
- * @{
- */
-
-/*!
- * @brief Initialize timer to implement wait event timeout.
- */
-void SDMMCEVENT_InitTimer(void);
-
-/* Callback function for SDHC */
-
-/*!
  * @brief Create event.
  * @param eventType The event type
  * @retval true Create event successfully.

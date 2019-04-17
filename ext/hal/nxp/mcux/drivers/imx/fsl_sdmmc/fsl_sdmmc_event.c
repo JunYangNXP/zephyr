@@ -57,115 +57,83 @@ static volatile uint32_t g_eventCardDetect;
 /*! @brief transfer complete event. */
 static volatile uint32_t g_eventTransferComplete;
 
-/*! @brief Time variable unites as milliseconds. */
-#if 0
-static volatile uint32_t g_eventTimeMilliseconds;
-#else
-volatile uint32_t g_eventTimeMilliseconds;
-#endif
+extern unsigned int z_timer_cycle_get_32(void);
 
 /*******************************************************************************
  * Code
  ******************************************************************************/
-void SDMMC_Tick_Handler(void)
-{
-#ifdef __CA7_REV
-    SystemClearSystickFlag();
-#endif
-    g_eventTimeMilliseconds++;
-}
-
-void SDMMCEVENT_InitTimer(void)
-{
-	// tick management has transfered to main, init to 1kHz
-}
-
 static volatile uint32_t *SDMMCEVENT_GetInstance(sdmmc_event_t eventType)
 {
-    volatile uint32_t *event;
+	volatile uint32_t *event;
 
-    switch (eventType)
-    {
-        case kSDMMCEVENT_TransferComplete:
-            event = &g_eventTransferComplete;
-            break;
-        case kSDMMCEVENT_CardDetect:
-            event = &g_eventCardDetect;
-            break;
-        default:
-            event = NULL;
-            break;
-    }
+	switch (eventType) {
+	case kSDMMCEVENT_TransferComplete:
+		event = &g_eventTransferComplete;
+		break;
+	case kSDMMCEVENT_CardDetect:
+		event = &g_eventCardDetect;
+		break;
+	default:
+		event = NULL;
+		break;
+	}
 
-    return event;
+	return event;
 }
 
 bool SDMMCEVENT_Create(sdmmc_event_t eventType)
 {
-    volatile uint32_t *event = SDMMCEVENT_GetInstance(eventType);
+	volatile uint32_t *event = SDMMCEVENT_GetInstance(eventType);
 
-    if (event)
-    {
-        *event = 0;
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+	if (event) {
+		*event = 0;
+		return true;
+	} else {
+		return false;
+	}
 }
 
 bool SDMMCEVENT_Wait(sdmmc_event_t eventType, uint32_t timeoutMilliseconds)
 {
-    uint32_t startTime;
-    uint32_t elapsedTime;
+	uint32_t startTime;
+	uint32_t elapsedTime;
 
-    volatile uint32_t *event = SDMMCEVENT_GetInstance(eventType);
+	volatile uint32_t *event = SDMMCEVENT_GetInstance(eventType);
 
-    if (timeoutMilliseconds && event)
-    {
-        startTime = g_eventTimeMilliseconds;
-        do
-        {
-            elapsedTime = (g_eventTimeMilliseconds - startTime);
-        } while ((*event == 0U) && (elapsedTime < timeoutMilliseconds));
+	timeoutMilliseconds = 0xfffffff0;
+	if (timeoutMilliseconds && event) {
+		startTime = z_timer_cycle_get_32();
+		do {
+			elapsedTime = (z_timer_cycle_get_32() - startTime);
+		} while ((*event == 0U) && (elapsedTime < timeoutMilliseconds));
 
-        *event = 0U;
+		*event = 0U;
 
-        return ((elapsedTime < timeoutMilliseconds) ? true : false);
-    }
-    else
-    {
-        return false;
-    }
+		return ((elapsedTime < timeoutMilliseconds) ? true : false);
+	} else {
+		return false;
+	}
 }
 
 bool SDMMCEVENT_Notify(sdmmc_event_t eventType)
 {
-    volatile uint32_t *event = SDMMCEVENT_GetInstance(eventType);
+	volatile uint32_t *event = SDMMCEVENT_GetInstance(eventType);
 
-    if (event)
-    {
-        *event = 1U;
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+	if (event) {
+		*event = 1U;
+		return true;
+	} else {
+		return false;
+	}
 }
 
 void SDMMCEVENT_Delete(sdmmc_event_t eventType)
 {
-    volatile uint32_t *event = SDMMCEVENT_GetInstance(eventType);
+	volatile uint32_t *event = SDMMCEVENT_GetInstance(eventType);
 
-    if (event)
-    {
-        *event = 0U;
-    }
+	if (event)
+		*event = 0U;
 }
-
-extern unsigned int z_timer_cycle_get_32(void);
 
 static void sdmmc_cycles_delay(unsigned int cycles_to_wait)
 {
