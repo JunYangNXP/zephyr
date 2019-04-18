@@ -112,6 +112,8 @@ static void *mcux_csi_get_framebuffer(const struct device *dev)
 {
 	struct mcux_csi_data *data = dev->driver_data;
 
+	k_sem_take(&data->sem, K_FOREVER);
+	k_sem_give(&data->sem);
 	return data->fb[0].data;
 }
 
