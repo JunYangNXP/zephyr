@@ -36,10 +36,13 @@ typedef void (*camera_capture_cb)(void *fb, int w, int h, int bpp);
 
 typedef int (*camera_capture_api)(const struct device *dev, camera_capture_cb cb);
 
-typedef void *(*camera_get_framebuffer_api)(const struct device *dev);
+typedef int (*camera_setformat_api)(const struct device *dev, enum camera_pixel_format format);
+
+typedef void *(*camera_get_framebuffer_api)(const struct device *dev, int *w, int *h, int *bpp);
 
 struct camera_driver_api {
 	camera_capture_api capture;
+	camera_setformat_api set_format;
 	camera_get_framebuffer_api get_framebuffer;
 };
 
@@ -52,12 +55,22 @@ static inline int camera_capture(const struct device *dev,
 	return api->capture(dev, cb);
 }
 
-static inline void *camera_get_framebuffer(const struct device *dev)
+static inline int camera_set_format(const struct device *dev,
+		enum camera_pixel_format format)
 {
 	struct camera_driver_api *api =
 		(struct camera_driver_api *)dev->driver_api;
 
-	return api->get_framebuffer(dev);
+	return api->set_format(dev, format);
+}
+
+static inline void *camera_get_framebuffer(const struct device *dev,
+	int *width, int *height, int *bpp)
+{
+	struct camera_driver_api *api =
+		(struct camera_driver_api *)dev->driver_api;
+
+	return api->get_framebuffer(dev, width, height, bpp);
 }
 
 #ifdef __cplusplus

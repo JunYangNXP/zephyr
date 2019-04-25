@@ -56,12 +56,22 @@ struct mcux_csi_config {
 	void (*irq_config_func)(struct device *dev);
 };
 
+struct mcux_csi_fb_attr {
+	int width;
+	int height;
+	int bpp;
+};
+
+#define CSI_FB_NUM 2
+
 struct mcux_csi_data {
-	struct k_mem_block fb[2];
+	struct k_mem_block fb[CSI_FB_NUM];
 	struct k_sem sem;
 	volatile uint8_t current_idx;
 	volatile uint8_t total_idx;
+	struct mcux_csi_fb_attr fb_attr[CSI_FB_NUM];
 	camera_capture_cb customer_cb;
+	enum camera_pixel_format format;
 };
 
 static int csi_start(CSI_Type *base, struct mcux_csi_data *data)
@@ -108,12 +118,32 @@ static int mcux_csi_capture(const struct device *dev,
 	return 0;
 }
 
-static void *mcux_csi_get_framebuffer(const struct device *dev)
+static int mcux_csi_set_format(const struct device *dev,
+			enum camera_pixel_format format)
+{
+	struct mcux_csi_data *data = dev->driver_data;
+
+	data->format = format;
+	if (format == CAMERA_PIXEL_FORMAT_YUV) {
+		data->fb_attr[0].bpp = 1;
+		data->fb_attr[1].bpp = 1;
+	} else if (format == CAMERA_PIXEL_FORMAT_RGB_565) {
+		data->fb_attr[0].bpp = 2;
+		data->fb_attr[1].bpp = 2;
+	}
+	return 0;
+}
+
+static void *mcux_csi_get_framebuffer(const struct device *dev, int *w, int *h, int *bpp)
 {
 	struct mcux_csi_data *data = dev->driver_data;
 
 	k_sem_take(&data->sem, K_FOREVER);
 	k_sem_give(&data->sem);
+	assert(w && h && bpp);
+	*w = data->fb_attr[0].width;
+	*h = data->fb_attr[0].height;
+	*bpp = data->fb_attr[0].bpp;
 	return data->fb[0].data;
 }
 
@@ -134,8 +164,8 @@ static void mcux_csi_isr(void *arg)
 	assert(csisr & (CSI_CSISR_DMA_TSF_DONE_FB2_MASK | CSI_CSISR_DMA_TSF_DONE_FB1_MASK));
 
 	if (data->customer_cb)
-		data->customer_cb(data->fb[data->current_idx].data, MCUX_CSI_CAMERA_WIDTH,
-			MCUX_CSI_CAMERA_HEIGHT, MCUX_CSI_BPP);
+		data->customer_cb(data->fb[data->current_idx].data, data->fb_attr[data->current_idx].width,
+			data->fb_attr[data->current_idx].height, data->fb_attr[data->current_idx].bpp);
 
 	k_sem_give(&data->sem);
 
@@ -309,12 +339,16 @@ static int mcux_csi_init(struct device *dev)
 	k_sem_init(&data->sem, 1, 1);
 	data->current_idx = 0;
 	data->total_idx = ARRAY_SIZE(data->fb);
+	data->format = CAMERA_PIXEL_FORMAT_RGB_565;
 	for (i = 0; i < ARRAY_SIZE(data->fb); i++) {
 		if (k_mem_pool_alloc(&mcux_csi_pool, &data->fb[i],
 				     MCUX_CSI_CAMERA_WIDTH * MCUX_CSI_CAMERA_HEIGHT * MCUX_CSI_BPP, K_NO_WAIT) != 0) {
 			printk("Could not allocate frame buffer %d", i);
 			return -ENOMEM;
 		}
+		data->fb_attr[i].width = MCUX_CSI_CAMERA_WIDTH;
+		data->fb_attr[i].height = MCUX_CSI_CAMERA_HEIGHT;
+		data->fb_attr[i].bpp = MCUX_CSI_BPP;
 	}
 	csi_init(config->base);
 	config->irq_config_func(dev);
@@ -324,6 +358,7 @@ static int mcux_csi_init(struct device *dev)
 
 static const struct camera_driver_api mcux_camera_api = {
 	.capture = mcux_csi_capture,
+	.set_format = mcux_csi_set_format,
 	.get_framebuffer = mcux_csi_get_framebuffer,
 };
 
