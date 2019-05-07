@@ -10,6 +10,7 @@ menu "C++ Options"
 
 config CPLUSPLUS
 	bool "Enable C++ support for the application"
+	default y
 	help
 	  This option enables the use of applications built with C++.
 
@@ -50,6 +51,7 @@ endchoice
 config LIB_CPLUSPLUS
 	depends on CPLUSPLUS
 	bool "Link with STD C++ library"
+	default y
 	help
 	  Link with STD C++ Library.
 

@@ -29,6 +29,7 @@ struct sys_mem_pool_lvl {
 struct sys_mem_pool_base {
 	void *buf;
 	size_t max_sz;
+	size_t min_sz;
 	u16_t n_max;
 	u8_t n_levels;
 	s8_t max_inline_level;

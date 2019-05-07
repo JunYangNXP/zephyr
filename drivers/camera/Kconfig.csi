@@ -6,7 +6,5 @@
 
 menuconfig CMOS_IMAGE_SENSOR_INTERFACE
 	bool "MCUX cmos sensor driver"
-	default y
-	#depends on HAS_MCUX_ELCDIF
 	help
 	  Enable support for mcux cmos sensor driver.

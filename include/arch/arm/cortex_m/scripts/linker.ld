@@ -409,6 +409,13 @@ SECTIONS
 	*(COMMON)
 	*(".kernel_bss.*")
 
+#ifdef CONFIG_MEM_POOL_NO_ZERO_INIT
+	. = ALIGN (64);
+	_k_mem_pool_buf_start = .;
+	*(_k_mem_pool_buf)
+	_k_mem_pool_buf_end = .;
+#endif
+
 #ifdef CONFIG_CUSTOM_SYMBOL_LAYOUT
 	_jpeg_buf = .;
 	. = . + (10 * 1024);

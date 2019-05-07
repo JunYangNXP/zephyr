@@ -141,10 +141,22 @@ extern void idle(void *unused1, void *unused2, void *unused3);
  *
  * @return N/A
  */
+#ifdef CONFIG_MEM_POOL_NO_ZERO_INIT
+extern char _k_mem_pool_buf_start[];
+extern char _k_mem_pool_buf_end[];
+#endif
+
 void z_bss_zero(void)
 {
+#ifdef CONFIG_MEM_POOL_NO_ZERO_INIT
+	(void)memset(&__bss_start, 0,
+		((u32_t) &_k_mem_pool_buf_start[0] - (u32_t) &__bss_start));
+	(void)memset(&_k_mem_pool_buf_end[0], 0,
+		((u32_t) &__bss_end - (u32_t) &_k_mem_pool_buf_end[0]));
+#else
 	(void)memset(&__bss_start, 0,
 		     ((u32_t) &__bss_end - (u32_t) &__bss_start));
+#endif
 #ifdef DT_CCM_BASE_ADDRESS
 	(void)memset(&__ccm_bss_start, 0,
 		     ((u32_t) &__ccm_bss_end - (u32_t) &__ccm_bss_start));

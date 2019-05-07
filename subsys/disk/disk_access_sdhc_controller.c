@@ -123,7 +123,7 @@ static const struct disk_operations soc_sdhc_disk_ops = {
 };
 
 static struct disk_info soc_sdhc_disk = {
-	.name = "sdhc_soc",
+	.name = CONFIG_DISK_SOC_SDHC_VOLUME_NAME,
 	.ops = &soc_sdhc_disk_ops,
 };
 

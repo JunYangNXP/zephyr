@@ -487,6 +487,12 @@ config HEAP_MEM_POOL_SIZE
 	  are: 256, 1024, 4096, and 16384. A size of zero means that no
 	  heap memory pool is defined.
 
+config MEM_POOL_NO_ZERO_INIT
+	bool "Do not clear memory pool located inside bss segment"
+	help
+	 Do not clear memory pool in boot up if pool size it too large for
+	 fast boot.
+
 config HEAP_MEM_POOL_MIN_SIZE
 	int "The smallest blocks in the heap memory pool (in bytes)"
 	depends on HEAP_MEM_POOL_SIZE != 0

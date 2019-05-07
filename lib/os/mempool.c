@@ -82,7 +82,11 @@ void z_sys_mem_pool_base_init(struct sys_mem_pool_base *p)
 	int i;
 	size_t buflen = p->n_max * p->max_sz, sz = p->max_sz;
 	u32_t *bits = (u32_t *)((u8_t *)p->buf + buflen);
+#ifdef CONFIG_MEM_POOL_NO_ZERO_INIT
+	size_t bits_size = _MPOOL_BITS_SIZE(p->max_sz, p->min_sz, p->n_max);
 
+	memset((char *)bits, 0, bits_size);
+#endif
 	p->max_inline_level = -1;
 
 	for (i = 0; i < p->n_levels; i++) {

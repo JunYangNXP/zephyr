@@ -8,7 +8,6 @@ menu "Disk"
 
 config DISK_ACCESS
 	bool "Enable Disk Interface"
-	default y
 	help
 	  Enable disk access over a supported media backend like FLASH or RAM
 
@@ -45,10 +44,9 @@ config DISK_ACCESS_SDHC
 	  File system on a SDHC card accessed over SPI.
 
 config DISK_ACCESS_SDHC_CONTROLLER
-	bool "SDHC card over SoC controller"
-	default y
+	bool "SDHC card over SDHC controller"
 	help
-	File system on a SDHC card accessed over SoC controller.
+	File system on a SDHC card accessed over SDHC controller.
 
 endif # DISK_ACCESS
 
@@ -121,4 +119,12 @@ config DISK_SDHC_VOLUME_NAME
 
 endif # DISK_ACCESS_SDHC
 
+if DISK_ACCESS_SDHC_CONTROLLER
+
+config DISK_SOC_SDHC_VOLUME_NAME
+	string "SOC SDHC Disk mount point or drive name"
+	default "SOC_SDHC"
+	help
+	 Disk name as per file system naming guidelines.
+endif
 endmenu

@@ -4009,6 +4009,25 @@ struct k_mem_pool {
  * @param align Alignment of the pool's buffer (power of 2).
  * @req K-MPOOL-001
  */
+#include "autoconf.h"
+#ifdef CONFIG_MEM_POOL_NO_ZERO_INIT
+#define K_MEM_POOL_DEFINE(name, minsz, maxsz, nmax, align)		\
+	char __aligned(align) _mpool_buf_##name[_ALIGN4(maxsz * nmax)	\
+				  + _MPOOL_BITS_SIZE(maxsz, minsz, nmax)] \
+				  __attribute__((section("_k_mem_pool_buf, \"aw\", %nobits @"))); \
+	struct sys_mem_pool_lvl _mpool_lvls_##name[Z_MPOOL_LVLS(maxsz, minsz)]; \
+	struct k_mem_pool name __in_section(_k_mem_pool, static, name) = { \
+		.base = {						\
+			.buf = _mpool_buf_##name,			\
+			.max_sz = maxsz,				\
+			.min_sz = minsz,				\
+			.n_max = nmax,					\
+			.n_levels = Z_MPOOL_LVLS(maxsz, minsz),		\
+			.levels = _mpool_lvls_##name,			\
+			.flags = SYS_MEM_POOL_KERNEL,			\
+		} \
+	}
+#else
 #define K_MEM_POOL_DEFINE(name, minsz, maxsz, nmax, align)		\
 	char __aligned(align) _mpool_buf_##name[_ALIGN4(maxsz * nmax)	\
 				  + _MPOOL_BITS_SIZE(maxsz, minsz, nmax)]; \
@@ -4020,10 +4039,11 @@ struct k_mem_pool {
 			.n_max = nmax,					\
 			.n_levels = Z_MPOOL_LVLS(maxsz, minsz),		\
 			.levels = _mpool_lvls_##name,			\
-			.flags = SYS_MEM_POOL_KERNEL			\
+			.flags = SYS_MEM_POOL_KERNEL,			\
 		} \
 	}
 
+#endif
 /**
  * @brief Allocate memory from a memory pool.
  *

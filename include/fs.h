@@ -441,6 +441,9 @@ int fs_stat(const char *path, struct fs_dirent *entry);
  */
 int fs_statvfs(const char *path, struct fs_statvfs *stat);
 
+int fs_get_mnt_point(struct fs_mount_t **mnt_pntp,
+		const char *name, size_t *match_len);
+
 /**
  * @brief Register a file system
  *

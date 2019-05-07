@@ -146,13 +146,21 @@
 /*---------------------------------------------------------------------------/
 / Drive/Volume Configurations
 /---------------------------------------------------------------------------*/
-
+#include "autoconf.h"
+#ifdef CONFIG_DISK_SOC_SDHC_VOLUME_NAME
+#define _VOLUMES	9
+#else
 #define _VOLUMES	8
+#endif
 /* Number of volumes (logical drives) to be used. */
 
 
 #define _STR_VOLUME_ID	1
+#ifdef CONFIG_DISK_SOC_SDHC_VOLUME_NAME
+#define _VOLUME_STRS	"RAM","NAND","CF","SD","SD2","USB","USB2","USB3",CONFIG_DISK_SOC_SDHC_VOLUME_NAME
+#else
 #define _VOLUME_STRS	"RAM","NAND","CF","SD","SD2","USB","USB2","USB3"
+#endif
 /* _STR_VOLUME_ID switches string support of volume ID.
 /  When _STR_VOLUME_ID is set to 1, also pre-defined strings can be used as drive
 /  number in the path name. _VOLUME_STRS defines the drive ID strings for each
@@ -225,7 +233,7 @@
 /  defined by _NORTC_MON, _NORTC_MDAY and _NORTC_YEAR in local time.
 /  To enable timestamp function (_FS_NORTC = 0), get_fattime() function need to be
 /  added to the project to get current time form real-time clock. _NORTC_MON,
-/  _NORTC_MDAY and _NORTC_YEAR have no effect. 
+/  _NORTC_MDAY and _NORTC_YEAR have no effect.
 /  These options have no effect at read-only configuration (_FS_READONLY = 1). */
 
 
