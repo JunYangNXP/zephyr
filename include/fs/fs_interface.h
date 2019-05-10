@@ -11,11 +11,7 @@
 extern "C" {
 #endif
 
-#ifdef CONFIG_FILE_SYSTEM_NFFS
 #define MAX_FILE_NAME 256
-#else /* FAT_FS */
-#define MAX_FILE_NAME 12 /* Uses 8.3 SFN */
-#endif
 
 struct fs_mount_t;
 

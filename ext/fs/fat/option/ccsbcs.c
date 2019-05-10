@@ -21,8 +21,8 @@
 /   869   Greek 2
 */
 
-#include "../ff.h"
 
+#include "../include/ff.h"
 
 #if _CODE_PAGE == 437
 #define _TBLDEF 1
